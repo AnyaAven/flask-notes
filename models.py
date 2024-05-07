@@ -6,6 +6,7 @@ dbx = db.session.execute
 
 bcrypt = Bcrypt()
 
+
 class User(db.Model):
     """ Site user """
 
@@ -38,4 +39,32 @@ class User(db.Model):
         nullable=False,
     )
 
+    # start_register
+    @classmethod
+    def register(cls, username, pwd):
+        """Register user w/hashed password & return user."""
 
+        hashed = bcrypt.generate_password_hash(pwd).decode('utf8')
+
+        # return instance of user w/username and hashed pwd
+        return cls(username=username, password=hashed)
+
+    # end_register
+
+    # start_authenticate
+    @classmethod
+    def authenticate(cls, username, pwd):
+        """Validate that user exists & password is correct.
+
+        Return user if valid; else return False.
+        """
+
+        q = (db.select(cls).filter_by(username=username))
+        u = dbx(q).scalar_one_or_none()
+
+        if u and bcrypt.check_password_hash(u.password, pwd):
+            # return user instance
+            return u
+        else:
+            return False
+    # end_authenticate
