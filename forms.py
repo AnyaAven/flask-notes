@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, EmailField
 from wtforms.validators import InputRequired, Email, Length, ValidationError
-
+from models import db, dbx, User
 
 class RegisterForm(FlaskForm):
     """Form for registering a user."""
@@ -47,14 +47,21 @@ class RegisterForm(FlaskForm):
         ]
     )
 
-    # def validate_username(self, username):
-    #     # TODO: double check the username.data part
-    #     """Checks if the username exists in the database already.
-    #     If so, raises a validation error."""
-    #     user = self.query.filter_by(username=username.data).first()
-    #     if user:
-    #         return False
-    #     return True
+    def is_valid_username(self, username):
+        """Checks if the username exists in the database already."""
+
+        user = db.session.get(User, username)
+        if user:
+            return False
+        return True
+
+    def is_valid_email(self, email):
+        """Checks if the username exists in the database already."""
+
+        user = db.session.get(User, email)
+        if user:
+            return False
+        return True
 
 
 # FIXME: LoginForm was copied from hash lecture
