@@ -40,7 +40,7 @@ class RegisterForm(FlaskForm):
     )
 
     last_name = StringField(
-        "First name",
+        "Last name",
         validators=[
             InputRequired(),
             Length(max=30, message="Limit is 30 characters"),
