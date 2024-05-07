@@ -97,7 +97,7 @@ def login():
         user = User.authenticate(name, pwd)
 
         if user:
-            session["user_id"] = user.id  # keep logged in
+            session["username"] = user.username  # keep logged in
             return redirect(f"/users/{name}")
 
         else:
@@ -111,5 +111,7 @@ def display_user(username):
     """Displays user information for the logged in user (username, first name
     last name, email)"""
 
+    user = db.get_or_404(User, username)
+
     # TODO:
-    return render_template("user_info.jinja")
+    return render_template("user_info.jinja", user=user)
