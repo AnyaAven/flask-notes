@@ -54,14 +54,28 @@ def register():
         #     flash(f"Sorry, username has already been taken.")
         #     return render_template("register.jinja", form=form)
 
+        # Check if username and email is valid
+        errs = False
+        if not form.is_valid_username(name):
+            form.username.errors = ["Username taken"]
+            errs = True
+
+        if not form.is_valid_email(email):
+            form.email.errors = ["Email taken"]
+            errs = True
+
+        if errs:
+            print("!!!!!!!!!!", form.email.errors, form.username.errors)
+            return render_template("register.jinja", form=form)
+
         # adding new user into db
         # User.register method is hashing the password
         user = User.register(
             username=name,
-            pwd=password,
+            password=password,
             email=email,
-            fname=first_name,
-            lname=last_name,
+            first_name=first_name,
+            last_name=last_name,
         )
         db.session.add(user)
         db.session.commit()
