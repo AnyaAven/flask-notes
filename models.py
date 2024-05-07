@@ -14,7 +14,7 @@ class User(db.Model):
 
     username = db.mapped_column(
         db.String(20),
-        db.Identity(),
+        unique=True,
         primary_key=True,
     )
 
@@ -41,13 +41,21 @@ class User(db.Model):
 
     # start_register
     @classmethod
-    def register(cls, username, pwd):
-        """Register user w/hashed password & return user."""
+    def register(cls, username, pwd, email, fname, lname):
+        """Register user
+        w/hashed password, username, email, first name, and last name
+        Return user."""
 
         hashed = bcrypt.generate_password_hash(pwd).decode('utf8')
 
         # return instance of user w/username and hashed pwd
-        return cls(username=username, password=hashed)
+        return cls(
+            username=username,
+            password=hashed,
+            email=email,
+            fname=fname,
+            lname=lname,
+        )
 
     # end_register
 
