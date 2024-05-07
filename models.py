@@ -82,3 +82,20 @@ class User(db.Model):
         else:
             return False
     # end_authenticate
+
+    @classmethod
+    def is_valid_username(cls, username):
+        """Checks if the username exists in the database already."""
+        user = db.session.query(cls).filter(cls.username == username).first()
+        if user:
+            return False
+        return True
+
+    @classmethod
+    def is_valid_email(cls, email):
+        """Checks if the email exists in the database already."""
+
+        user = db.session.query(cls).filter(cls.email == email).first()
+        if user:
+            return False
+        return True
