@@ -102,7 +102,7 @@ def login():
 
         else:
             form.username.errors = ["Incorrect name/password"]
-    # TODO:
+
     return render_template("login.jinja", form=form)
 
 
@@ -113,5 +113,23 @@ def display_user(username):
 
     user = db.get_or_404(User, username)
 
-    # TODO:
-    return render_template("user_info.jinja", user=user)
+    if "username" not in session:
+        flash("You must be logged in to view!")
+
+        return redirect("/login")
+
+    else:
+        return render_template("user_info.jinja", user=user)
+
+
+@app.post("/logout")
+def logout():
+    """Logs user out and redirects to homepage."""
+
+    form = CSRFProtectForm()
+
+    if form.validate_on_submit():
+        # Remove "username" if present, but no errors if it wasn't
+        session.pop("username", None)
+
+    return redirect("/")
