@@ -26,8 +26,6 @@ toolbar = DebugToolbarExtension(app)
 def homepage():
     """Show homepage with links to site areas."""
 
-    # form = CSRFProtectForm() TODO: where do we need this?
-
     return redirect("/register")
 
 
@@ -35,6 +33,7 @@ def homepage():
 def register():
     """Register user: produce form & handle form submission.
         - Checks if username is unique in the DB
+        - Creates new user if all validation checks pass
     """
 
     form = RegisterForm()
@@ -48,11 +47,11 @@ def register():
 
         # Check if username and email is valid
         errs = False
-        if not form.is_valid_username(name):
+        if not User.is_valid_username(name):
             form.username.errors = ["Username taken"]
             errs = True
 
-        if not form.is_valid_email(email):
+        if not User.is_valid_email(email):
             form.email.errors = ["Email taken"]
             errs = True
 
@@ -74,6 +73,8 @@ def register():
         # putting the username into the session so that the we can remember who is logged in
         # browser is stateless
         session["username"] = user.username
+
+        flash(f"Added {user.full_name}")
 
         # on successful login, redirect to secret page (authenticated)
         return redirect(f"/users/{name}")
@@ -109,7 +110,11 @@ def login():
 @app.get("/users/<username>")
 def display_user(username):
     """Displays user information for the logged in user (username, first name
-    last name, email)"""
+    last name, email)
+
+    Checks for user authorization to view user page. Else redirects to user's
+    own page.
+    """
 
     user = db.get_or_404(User, username)
 
@@ -119,6 +124,10 @@ def display_user(username):
         return redirect("/login")
 
     else:
+        if session["username"] != username:
+            flash(f"You don't have authorization to view {username}.")
+            return redirect(f"/users/{session["username"]}")
+
         return render_template("user_info.jinja", user=user)
 
 
