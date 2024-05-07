@@ -1,0 +1,58 @@
+{% extends 'base.jinja' %}
+
+{% block content %}
+
+    <!-- Test comment for user_info -->
+    <div class="container">
+
+        <div class="row">
+            <div>
+                <h1 class="pt-4 mb-3 text-center">Hello {{ user.full_name }}</h1>
+                <p>Username: {{ user.username}}</p>
+                <p>Email: {{ user.email }}</p>
+                <p>First Name: {{ user.first_name }}</p>
+                <p>Last Name: {{ user.last_name }}</p>
+
+            </div>
+
+{# Here's a way to add a form method and action to a button to handle multiple routes #}
+            {# <form >
+                <button
+                class="btn btn-primary btn-lg w-100"
+                formmethod="GET"
+                formaction="/users/{{ user.username }}/edit">
+                    Edit
+                </button>
+
+                <button
+                class="btn btn-danger btn-lg w-100"
+                formmethod="POST"
+                formaction="/users/{{ user.username }}/delete">
+                    Delete
+                </button>
+            </form> #}
+
+        </div>
+{# FIXME:  CHANGE TO NOTES!!#}
+        {# <div class="row">
+            <div>
+                <h1 class="pt-4 mb-3 text-center">Posts</h1>
+            </div>
+
+                <ul>
+                    {% for post in user.posts %}
+                        <li>
+                            <a href="/posts/{{ post.id }}">{{ post.title }}</a>
+                            {{ post.friendly_date }}
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <a href="/users/{{ user.id }}/posts/new" class="btn btn-primary btn-lg w-100">
+                    Add Post
+                </a>
+        </div> #}
+
+  </div>
+
+{% endblock %}
