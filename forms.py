@@ -47,14 +47,14 @@ class RegisterForm(FlaskForm):
         ]
     )
 
-    def validate_username(self, username):
-        # TODO: double check the username.data part
-        """Checks if the username exists in the database already.
-        If so, raises a validation error."""
-        user = self.query.filter_by(username=username.data).first()
-        if user:
-            return False
-        return True
+    # def validate_username(self, username):
+    #     # TODO: double check the username.data part
+    #     """Checks if the username exists in the database already.
+    #     If so, raises a validation error."""
+    #     user = self.query.filter_by(username=username.data).first()
+    #     if user:
+    #         return False
+    #     return True
 
 
 # FIXME: LoginForm was copied from hash lecture
