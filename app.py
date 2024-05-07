@@ -46,14 +46,6 @@ def register():
         first_name = form.first_name.data
         last_name = form.last_name.data
 
-        # check if username is unique in DB
-        # check_valid_username = name.validate_username
-
-        # # TODO: question: how can we write this without duplicating what's in the else?
-        # if (check_valid_username is False):
-        #     flash(f"Sorry, username has already been taken.")
-        #     return render_template("register.jinja", form=form)
-
         # Check if username and email is valid
         errs = False
         if not form.is_valid_username(name):
@@ -65,7 +57,6 @@ def register():
             errs = True
 
         if errs:
-            print("!!!!!!!!!!", form.email.errors, form.username.errors)
             return render_template("register.jinja", form=form)
 
         # adding new user into db
@@ -80,7 +71,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        # putting the user_id into the session so that the we can remember who is logged in
+        # putting the username into the session so that the we can remember who is logged in
         # browser is stateless
         session["username"] = user.username
 
