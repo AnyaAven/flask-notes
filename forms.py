@@ -58,7 +58,7 @@ class RegisterForm(FlaskForm):
     def is_valid_email(self, email):
         """Checks if the username exists in the database already."""
 
-        user = db.session.get(User, email)
+        user = db.session.query(User).filter(User.email == email).first()
         if user:
             return False
         return True
