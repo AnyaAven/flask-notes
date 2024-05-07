@@ -26,9 +26,9 @@ toolbar = DebugToolbarExtension(app)
 def homepage():
     """Show homepage with links to site areas."""
 
-    form = CSRFProtectForm()
-    # TODO: put stuff in index.jinja
-    return render_template("index.jinja", form=form)
+    # form = CSRFProtectForm() TODO: where do we need this?
+
+    return redirect("/register")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -41,7 +41,11 @@ def register():
 
     if form.validate_on_submit():
         name = form.username.data
-        pwd = form.password.data
+        password = form.password.data
+        email = form.email.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
+
 
         # check if username is unique in DB
         check_valid_username = name.validate_username
@@ -53,16 +57,22 @@ def register():
 
         # adding new user into db
         # User.register method is hashing the password
-        user = User.register(name, pwd)
+        user = User.register(
+            username=name,
+            pwd=password,
+            email=email,
+            fname=first_name,
+            lname=last_name,
+        )
         db.session.add(user)
         db.session.commit()
 
         # putting the user_id into the session so that the we can remember who is logged in
         # browser is stateless
-        session["user_id"] = user.id
+        session["username"] = user.username
 
         # on successful login, redirect to secret page (authenticated)
-        return redirect("/secret")
+        return redirect(f"/users/{name}")
 
     else:
         return render_template("register.jinja", form=form)
