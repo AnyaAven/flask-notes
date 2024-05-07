@@ -51,10 +51,10 @@ class User(db.Model):
         # return instance of user w/username and hashed pwd
         return cls(
             username=username,
-            password=hashed,
+            hashed_password=hashed,
             email=email,
-            fname=fname,
-            lname=lname,
+            first_name=fname,
+            last_name=lname,
         )
 
     # end_register
