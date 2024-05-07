@@ -1,0 +1,10 @@
+{% extends "base.jinja" %}
+{% block content %}
+    <h1>Register a new user!</h1>
+
+    <form method="POST">
+    {% include "_form.jinja" %}
+    <button class="btn btn-success" type="submit">Add</button>
+    </form>
+
+{% endblock %}
