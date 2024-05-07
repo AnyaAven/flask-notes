@@ -39,6 +39,12 @@ class User(db.Model):
         nullable=False,
     )
 
+    # Note: the @property function can only take 'self'
+    @property
+    def full_name(self):
+        """returns first and last name"""
+        return (f"{self.first_name} {self.last_name}")
+
     # start_register
     @classmethod
     def register(cls, username, password, email, first_name, last_name):
@@ -70,7 +76,7 @@ class User(db.Model):
         q = (db.select(cls).filter_by(username=username))
         u = dbx(q).scalar_one_or_none()
 
-        if u and bcrypt.check_password_hash(u.password, pwd):
+        if u and bcrypt.check_password_hash(u.hashed_password, pwd):
             # return user instance
             return u
         else:
