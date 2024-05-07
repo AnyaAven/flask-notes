@@ -46,14 +46,13 @@ def register():
         first_name = form.first_name.data
         last_name = form.last_name.data
 
-
         # check if username is unique in DB
-        check_valid_username = name.validate_username
+        # check_valid_username = name.validate_username
 
-        # TODO: question: how can we write this without duplicating what's in the else?
-        if (check_valid_username is False):
-            flash(f"Sorry, username has already been taken.")
-            return render_template("register.jinja", form=form)
+        # # TODO: question: how can we write this without duplicating what's in the else?
+        # if (check_valid_username is False):
+        #     flash(f"Sorry, username has already been taken.")
+        #     return render_template("register.jinja", form=form)
 
         # adding new user into db
         # User.register method is hashing the password
@@ -76,3 +75,36 @@ def register():
 
     else:
         return render_template("register.jinja", form=form)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Produce login form or handle login."""
+
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        name = form.username.data
+        pwd = form.password.data
+
+        # calling authenticate method on the class on the user
+        # authenticate will return a user or False
+        user = User.authenticate(name, pwd)
+
+        if user:
+            session["user_id"] = user.id  # keep logged in
+            return redirect(f"/users/{name}")
+
+        else:
+            form.username.errors = ["Incorrect name/password"]
+    # TODO:
+    return render_template("login.jinja", form=form)
+
+
+@app.get("/users/<username>")
+def display_user(username):
+    """Displays user information for the logged in user (username, first name
+    last name, email)"""
+
+    # TODO:
+    return render_template("user_info.jinja")
