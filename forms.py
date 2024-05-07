@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, EmailField
 from wtforms.validators import InputRequired, Email, Length, ValidationError
 from models import db, dbx, User
 
+
 class RegisterForm(FlaskForm):
     """Form for registering a user."""
 
