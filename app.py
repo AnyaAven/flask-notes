@@ -4,8 +4,8 @@ import os
 from flask import Flask, render_template, redirect, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
 
-from models import db, User
-from forms import RegisterForm, LoginForm, CSRFProtectForm
+from models import db, User, Note
+from forms import RegisterForm, LoginForm, CSRFProtectForm, NoteForm
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
@@ -29,6 +29,8 @@ def homepage():
 
     return redirect("/register")
 
+################################################################################
+# USER REGISTRATION
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -73,7 +75,6 @@ def register():
 
         # putting the username into the session so that the we can remember who is logged in
         # browser is stateless
-        # FIXME: can pull out "username" into a global variable - AUTH_KEY
         session[SESSION_KEY] = user.username
 
         flash(f"Added {user.full_name}")
@@ -84,6 +85,8 @@ def register():
     else:
         return render_template("register.jinja", form=form)
 
+################################################################################
+# USER LOGIN / LOGOUT
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -122,6 +125,8 @@ def logout():
 
     return redirect("/")
 
+################################################################################
+# USER INFO
 
 @app.get("/users/<username>")
 def display_user(username):
@@ -131,8 +136,6 @@ def display_user(username):
     Checks for user authorization to view user page. Else redirects to user's
     own page.
     """
-
-    # TODO: deal with all the ways a user shouldn't be here first
 
     if SESSION_KEY not in session:
         flash("You must be logged in to view!")
@@ -147,3 +150,38 @@ def display_user(username):
     # don't need to query database before we check everything above
     user = db.get_or_404(User, username)
     return render_template("user_info.jinja", user=user)
+
+################################################################################
+# NOTES
+
+
+@app.route("/users/<username>/notes/add", methods=["GET", "POST"])
+def add_note(username):
+    """ Add note to user """
+
+    if SESSION_KEY not in session or session[SESSION_KEY] != username:
+        flash("Not allowed.") # FIXME: change the flash
+
+        return redirect("/login")
+
+    form = NoteForm()
+    user = db.get_or_404(User, username)
+
+    if form.validate_on_submit():
+        title = form.title.data
+        content = form.content.data
+
+        note = Note(
+            title=title,
+            content=content,
+            owner_username=username,
+        )
+
+        db.session.add(note)
+        db.session.commit()
+
+        flash(f"Note {title} added!")
+
+
+
+    return render_template("note_add.jinja", form=form, username=user.username)
