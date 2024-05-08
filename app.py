@@ -72,6 +72,7 @@ def register():
 
         # putting the username into the session so that the we can remember who is logged in
         # browser is stateless
+        # FIXME: can pull out "username" into a global variable - AUTH_KEY
         session["username"] = user.username
 
         flash(f"Added {user.full_name}")
@@ -94,7 +95,7 @@ def login():
         pwd = form.password.data
 
         # calling authenticate method on the class on the user
-        # authenticate will return a user or False
+        # authenticate will return a user or None
         user = User.authenticate(name, pwd)
 
         if user:
@@ -107,6 +108,20 @@ def login():
     return render_template("login.jinja", form=form)
 
 
+@app.post("/logout")
+def logout():
+    """Logs user out and redirects to homepage."""
+
+    form = CSRFProtectForm()
+    # TODO: add a werkzeug things for unauthorized users
+
+    if form.validate_on_submit():
+
+        session.pop("username", None)
+
+    return redirect("/")
+
+
 @app.get("/users/<username>")
 def display_user(username):
     """Displays user information for the logged in user (username, first name
@@ -116,29 +131,18 @@ def display_user(username):
     own page.
     """
 
-    user = db.get_or_404(User, username)
+    # TODO: deal with all the ways a user shouldn't be here first
 
     if "username" not in session:
         flash("You must be logged in to view!")
 
         return redirect("/login")
 
-    else:
-        if session["username"] != username:
-            flash(f"You don't have authorization to view {username}.")
-            return redirect(f"/users/{session["username"]}")
+    if session["username"] != username:
 
-        return render_template("user_info.jinja", user=user)
+        flash(f"You don't have authorization to view {username}.")
+        return redirect(f"/users/{session["username"]}")
 
-
-@app.post("/logout")
-def logout():
-    """Logs user out and redirects to homepage."""
-
-    form = CSRFProtectForm()
-
-    if form.validate_on_submit():
-        # Remove "username" if present, but no errors if it wasn't
-        session.pop("username", None)
-
-    return redirect("/")
+    # don't need to query database before we check everything above
+    user = db.get_or_404(User, username)
+    return render_template("user_info.jinja", user=user)

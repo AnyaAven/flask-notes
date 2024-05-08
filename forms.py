@@ -19,7 +19,7 @@ class RegisterForm(FlaskForm):
         validators=[
             InputRequired(),
             Length(max=100, message="Limit is 100 characters"),
-        ]
+        ]  # FIXME: add a minimum length
     )
 
     email = EmailField(

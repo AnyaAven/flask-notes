@@ -49,10 +49,14 @@ class User(db.Model):
     @classmethod
     def register(cls, username, password, email, first_name, last_name):
         """Register user
-        w/hashed password, username, email, first name, and last name
+        and hash the password, username, email, first name, and last name
         Return user."""
 
         hashed = bcrypt.generate_password_hash(password).decode('utf8')
+
+        # FIXME: this is where to authenticate all the info
+        # raise error and catch the error in the route
+        # if error, show errors in the route
 
         # return instance of user w/username and hashed pwd
         return cls(
@@ -73,9 +77,11 @@ class User(db.Model):
         Return user if valid; else return False.
         """
 
+        # FIXME: db.session.get (just look in session, don't have to re-query the db - faster)
         q = (db.select(cls).filter_by(username=username))
         u = dbx(q).scalar_one_or_none()
 
+        # can refactor "u"to user
         if u and bcrypt.check_password_hash(u.hashed_password, pwd):
             # return user instance
             return u
@@ -86,16 +92,30 @@ class User(db.Model):
     @classmethod
     def is_valid_username(cls, username):
         """Checks if the username exists in the database already."""
+        # FIXME: when fetching a primary key, use session.get
+        # FIXME: use select/dbx instead of .query
         user = db.session.query(cls).filter(cls.username == username).first()
+
+        # FIXME: can just return user (bc .first() returns record or None )
         if user:
             return False
         return True
 
+    # FIXME: rename the fn name
+    # this rule is intrinsic to the form
+    # if validating email/username is part of the form, we can have this on the form
+    # can put the actual logic of how the check is done can be put in the model
     @classmethod
     def is_valid_email(cls, email):
         """Checks if the email exists in the database already."""
 
-        user = db.session.query(cls).filter(cls.email == email).first()
+        # FIXME: when not fetching primary key, use .where (to match SQL)
+        # FIXME: use select/dbx instead of .query
+        user = db.select(cls).where(cls.email == email).first()
+        # user = db.session.query(cls).filter(cls.email == email).first()
+
+        # FIXME: can just return user (bc .first() returns record or None )
+
         if user:
             return False
         return True
