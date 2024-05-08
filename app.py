@@ -138,18 +138,22 @@ def display_user(username):
     """
 
     if SESSION_KEY not in session:
+        # FIXME: is this a security flaw?
         flash("You must be logged in to view!")
 
         return redirect("/login")
 
     if session[SESSION_KEY] != username:
-
+        # FIXME: is this a security flaw?
         flash(f"You don't have authorization to view {username}.")
         return redirect(f"/users/{session[SESSION_KEY]}")
 
     # don't need to query database before we check everything above
+    # unauthorized users don't get any information from you if you -> security concept
     user = db.get_or_404(User, username)
-    return render_template("user_info.jinja", user=user)
+    form = CSRFProtectForm()
+
+    return render_template("user_info.jinja", user=user, form=form)
 
 ################################################################################
 # NOTES

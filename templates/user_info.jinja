@@ -19,11 +19,20 @@
 
 
             <form >
+                {{ form.hidden_tag() }} {# Adds csrf_token #}
+
                 <button
                 class="btn btn-danger btn-lg w-100"
                 formmethod="POST"
                 formaction="/users/{{ user.username }}/delete">
                     Delete account
+                </button>
+
+                <button
+                class="btn btn-danger btn-sm"
+                formaction="/logout"
+                formmethod="POST">
+                    Logout
                 </button>
             </form>
 
