@@ -39,6 +39,12 @@ class User(db.Model):
         nullable=False,
     )
 
+    notes = db.relationship(
+        'Note',
+        back_populates='notes',
+        cascade="all, delete-orphan",
+    )
+
     # Note: the @property function can only take 'self'
     @property
     def full_name(self):
@@ -119,3 +125,30 @@ class User(db.Model):
         if user:
             return False
         return True
+
+class Note(db.Model):
+    """ Note for site users """
+
+    __tablename__ = "notes"
+
+    id = db.mapped_column(
+        db.Integer,
+        db.Identity(),
+        primary_key=True,
+    )
+
+    title = db.mapped_column(
+        db.String(100),
+        nullable=False,
+    )
+
+    content = db.mapped_column(
+        db.Text,
+        nullable=False,
+    )
+
+    owner_username = db.mapped_column(
+        db.String(20),
+        db.ForeignKey("users.username")
+    )
+
