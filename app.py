@@ -21,6 +21,7 @@ db.create_all()
 
 toolbar = DebugToolbarExtension(app)
 
+SESSION_KEY = "username"
 
 @app.get("/")
 def homepage():
@@ -51,7 +52,7 @@ def register():
             form.username.errors = ["Username taken"]
             errs = True
 
-        if not User.is_valid_email(email):
+        if User.is_email_taken(email):
             form.email.errors = ["Email taken"]
             errs = True
 
@@ -73,7 +74,7 @@ def register():
         # putting the username into the session so that the we can remember who is logged in
         # browser is stateless
         # FIXME: can pull out "username" into a global variable - AUTH_KEY
-        session["username"] = user.username
+        session[SESSION_KEY] = user.username
 
         flash(f"Added {user.full_name}")
 
@@ -99,7 +100,7 @@ def login():
         user = User.authenticate(name, pwd)
 
         if user:
-            session["username"] = user.username  # keep logged in
+            session[SESSION_KEY] = user.username  # keep logged in
             return redirect(f"/users/{name}")
 
         else:
@@ -117,7 +118,7 @@ def logout():
 
     if form.validate_on_submit():
 
-        session.pop("username", None)
+        session.pop(SESSION_KEY, None)
 
     return redirect("/")
 
@@ -133,15 +134,15 @@ def display_user(username):
 
     # TODO: deal with all the ways a user shouldn't be here first
 
-    if "username" not in session:
+    if SESSION_KEY not in session:
         flash("You must be logged in to view!")
 
         return redirect("/login")
 
-    if session["username"] != username:
+    if session[SESSION_KEY] != username:
 
         flash(f"You don't have authorization to view {username}.")
-        return redirect(f"/users/{session["username"]}")
+        return redirect(f"/users/{session[SESSION_KEY]}")
 
     # don't need to query database before we check everything above
     user = db.get_or_404(User, username)

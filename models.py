@@ -41,7 +41,7 @@ class User(db.Model):
 
     notes = db.relationship(
         'Note',
-        back_populates='notes',
+        back_populates='owner',
         cascade="all, delete-orphan",
     )
 
@@ -112,19 +112,13 @@ class User(db.Model):
     # if validating email/username is part of the form, we can have this on the form
     # can put the actual logic of how the check is done can be put in the model
     @classmethod
-    def is_valid_email(cls, email):
+    def is_email_taken(cls, email):
         """Checks if the email exists in the database already."""
 
-        # FIXME: when not fetching primary key, use .where (to match SQL)
-        # FIXME: use select/dbx instead of .query
-        user = db.select(cls).where(cls.email == email).first()
-        # user = db.session.query(cls).filter(cls.email == email).first()
+        q = db.select(User).where(User.email == email)
+        user = dbx(q).first()
 
-        # FIXME: can just return user (bc .first() returns record or None )
-
-        if user:
-            return False
-        return True
+        return bool(user)
 
 class Note(db.Model):
     """ Note for site users """
@@ -149,6 +143,12 @@ class Note(db.Model):
 
     owner_username = db.mapped_column(
         db.String(20),
-        db.ForeignKey("users.username")
+        db.ForeignKey("users.username"),
+        nullable=False,
+    )
+
+    owner = db.relationship(
+        "User",
+        back_populates="notes",
     )
 
