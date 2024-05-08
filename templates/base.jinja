@@ -14,8 +14,16 @@
   <div class="container">
     <a class="navbar-brand" href="/">Home</a>
     <ul class="navbar-nav">
-        <li class="nav-item"><a class="nav-link" href="/login">Login / Logout </a></li> {# FIXME: logout it's ugly #}
-        <li class="nav-item"><a class="nav-link" href="/register">Register</a></li> {# FIXME: it's ugly #}
+
+        <li class="nav-item">
+        {% if 'username' not in session %}
+          <a class="nav-link" href="/login">Login</a>
+          <li class="nav-item"><a class="nav-link" href="/register">Register</a></li> {# FIXME: it's ugly #}
+          {% else %}
+          <li class="nav-item"><a class="nav-link" href="/login">Logout </a></li>
+        {% endif %}
+
+        </li>
     </ul>
   </div>
 </nav>
